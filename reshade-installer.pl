@@ -29,17 +29,40 @@ sub downloadFile {
     $response->is_success or die $response->status_line;
 }
 
-# TODO: make this non-XOM specific in the future
-my $gamePath = `defaults read dezent.XIV-on-Mac GamePath`;
-$gamePath =~ s/\s+$//;
-$gamePath = $gamePath . "/game/";
+sub getGamePath {
+    if (defined $ARGV[0]) {
+        if (-d $ARGV[0]) {
+            return $ARGV[0]
+        }
+        else {
+            print "Supplied argument [${ARGV[0]}] is not a valid directory!\n"
+        }
+    }
+    if ($^O eq "darwin") {
+        my $xomGamePath = `defaults read dezent.XIV-on-Mac GamePath`;
+        chomp $xomGamePath;
+        $xomGamePath = $xomGamePath . "/game/";
+        if (-d $xomGamePath) {
+            return $xomGamePath;
+        }
+    }
+    print "Please enter the directory ReShade should be installed into: ";
+    my $path = <STDIN>;
+    chomp $path;
+    if (-d $path) {
+        return $path;
+    }
+    die "Provided path [${path}] is not a folder!"
+}
 
+my $gamePath = getGamePath;
+print "Installing ReShade into: [${gamePath}]\n";
 
 my $reshadeSetup = $gamePath . "reshade_setup.exe";
 downloadFile("http://static.reshade.me/downloads/ReShade_Setup_" . reShadeVersion . "_Addon.exe", $reshadeSetup);
-
 my $exeContent = read_file $reshadeSetup;
 unlink $reshadeSetup;
+
 my $magicBytes = pack "CC", 0x50, 0x4b, 0x03, 0x04;
 my $zipOffset = index $exeContent, $magicBytes;
 my $zipContent = substr $exeContent, $zipOffset;
