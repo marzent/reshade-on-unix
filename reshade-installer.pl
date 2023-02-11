@@ -59,7 +59,7 @@ my $gamePath = getGamePath;
 print "Installing ReShade into: [${gamePath}]\n";
 
 my $reshadeSetup = $gamePath . "reshade_setup.exe";
-downloadFile("http://static.reshade.me/downloads/ReShade_Setup_" . reShadeVersion . "_Addon.exe", $reshadeSetup);
+downloadFile("https://reshade.me/downloads/ReShade_Setup_" . reShadeVersion . "_Addon.exe", $reshadeSetup);
 my $exeContent = read_file $reshadeSetup;
 unlink $reshadeSetup;
 
