@@ -13,12 +13,12 @@ $userAgent->agent("reshade-on-unix/0.1");
 $userAgent->show_progress(1);
 
 sub reShadeVersion {
-    my $req = HTTP::Request->new(GET => "https://reshade.me");
+    my $req = HTTP::Request->new(GET => "https://api.github.com/repos/crosire/reshade/tags");
     my $response = $userAgent->request($req);
     $response->is_success or die $response->status_line;
-    my ($version) = $response->decoded_content =~ /ReShade_Setup_([\d.]+)\.exe/
+    my ($version) = $response->decoded_content =~ /v([\d.]+)/ 
         or die "Could not extract version info";
-    return $version
+    return $version;
 }
 
 sub downloadFile {
